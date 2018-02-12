@@ -32,7 +32,6 @@ const (
 	//BT_INSTANCE = "around-post"
 	// Needs to update this URL if you deploy it to cloud.
 	ES_URL = "http://35.227.22.229:9200"
-
 )
 
 func main() {
@@ -103,7 +102,7 @@ func handlerSearch(w http.ResponseWriter, r *http.Request) {
 		ran = val + "km"
 	}
 
-	fmt.Printf( "Search received: %f %f %s\n", lat, lon, ran)
+	fmt.Printf("Search received: %f %f %s\n", lat, lon, ran)
 
 	// Create a client
 	client, err := elastic.NewClient(elastic.SetURL(ES_URL), elastic.SetSniff(false))
@@ -139,7 +138,8 @@ func handlerSearch(w http.ResponseWriter, r *http.Request) {
 	// However, it ignores errors in serialization.
 	var typ Post
 	var ps []Post
-	for _, item := range searchResult.Each(reflect.TypeOf(typ)) { // instance of
+	for _, item := range searchResult.Each(reflect.TypeOf(typ)) {
+		// instance of
 		p := item.(Post) // p = (Post) item
 		fmt.Printf("Post by %s: %s at lat %v and lon %v\n", p.User, p.Message, p.Location.Lat, p.Location.Lon)
 		// TODO(student homework): Perform filtering based on keywords such as web spam etc.
