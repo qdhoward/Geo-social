@@ -1,8 +1,8 @@
 import React from 'react';
 import $ from'jquery';
-import {Modal, Button, message} from 'antd';
-import {WrappedCreatePostForm} from './CreatePostForm';
-import {TOKEN_KEY, API_ROOT, POS_KEY, AUTH_PREFIX} from '../constants';
+import { Modal, Button, message } from 'antd';
+import { WrappedCreatePostForm } from './CreatePostForm';
+import { TOKEN_KEY, API_ROOT, POS_KEY, AUTH_PREFIX, LOC_SHAKE } from '../constants';
 
 export class CreatePostButton extends React.Component {
     state = {
@@ -20,8 +20,8 @@ export class CreatePostButton extends React.Component {
             if (!err) {
                 const formData = new FormData();
                 const {lat, lon} = JSON.parse(localStorage.getItem(POS_KEY));
-                formData.set('lat', lat + Math.random() * 0.1 - 0.05);
-                formData.set('lon', lon + Math.random() * 0.1 - 0.05);
+                formData.set('lat', lat + Math.random() * LOC_SHAKE * 2 - LOC_SHAKE);
+                formData.set('lon', lon + Math.random() * LOC_SHAKE * 2 - LOC_SHAKE);
                 formData.set('message', values.message);
                 formData.set('image', values.image[0]);
                 this.setState({
@@ -39,6 +39,7 @@ export class CreatePostButton extends React.Component {
                     dataType: 'text',
                 }).then((response) => {
                         message.success('created a post successfully.');
+                        this.form.resetFields();
                         return this.props.loadNearbyPosts().then(() => {
                             this.setState({
                                 visible: false,
@@ -47,6 +48,7 @@ export class CreatePostButton extends React.Component {
                         });
                     }, (error) => {
                         message.error(error.responseText);
+                        this.form.resetFields();
                     }
                 ).catch((error) => {
                     message.error('create post failed');

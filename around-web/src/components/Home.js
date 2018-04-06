@@ -2,6 +2,7 @@ import React from 'react';
 import {Tabs, Spin} from 'antd';
 import {TOKEN_KEY, GEO_OPTIONS, API_ROOT, AUTH_PREFIX, POS_KEY} from '../constants';
 import { Gallery } from './Gallery';
+import { WrappedAroundMap } from './AroundMap'
 import { CreatePostButton } from './CreatePostButton';
 import $ from 'jquery';
 const TabPane = Tabs.TabPane;
@@ -29,7 +30,7 @@ export class Home extends React.Component {
         console.log(position);
         const {latitude, longitude} = position.coords;
         localStorage.setItem(POS_KEY, JSON.stringify({lat: latitude, lon: longitude}));
-        this.loadNearbyPosts(position);
+        this.loadNearbyPosts();
     };
 
     onFailedGetGeoLocation = () => {
@@ -65,13 +66,14 @@ export class Home extends React.Component {
         }
     };
 
-    loadNearbyPosts = () => {
-        const lat = 37.535623;
-        const lon = -122.26956;
-        // const { lat, lon } = JSON.parse(localStorage.getItem(POS_KEY));
+    loadNearbyPosts = (position, radius) => {
+        // const lat = 37.535623;
+        // const lon = -122.26956;
+        const range = radius ? radius : 20;
+        const { lat, lon } = position ? position : JSON.parse(localStorage.getItem(POS_KEY));
         this.setState({loadingPosts: true});
         return $.ajax({
-            url: `${API_ROOT}/search?lat=${lat}&lon=${lon}&range=20`,
+            url: `${API_ROOT}/search?lat=${lat}&lon=${lon}&range=${range}`,
             method: 'GET',
             headers: {
                 Authorization: `${AUTH_PREFIX} ${localStorage.getItem(TOKEN_KEY)}`
@@ -88,13 +90,22 @@ export class Home extends React.Component {
     };
 
     render() {
-        const createPostButton = <CreatePostButton loadNearbyPosts={this.loadNearbyPosts}/>
+        const createPostButton = <CreatePostButton loadNearbyPosts={this.loadNearbyPosts}/>;
         return (
             <Tabs tabBarExtraContent={createPostButton} className="main-tabs">
                 <TabPane tab="Posts" key="1">
                     {this.getGalleryPanelContent()}
                 </TabPane>
-                <TabPane tab="Map" key="2">Content of tab 2</TabPane>
+                <TabPane tab="Map" key="2">
+                    <WrappedAroundMap
+                        loadNearbyPosts={this.loadNearbyPosts}
+                        posts={this.state.posts}
+                        googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg&v=3.exp&libraries=geometry,drawing,places"
+                        loadingElement={<div style={{ height: `100%` }} />}
+                        containerElement={<div style={{ height: `400px` }} />}
+                        mapElement={<div style={{ height: `100%` }} />}
+                    />
+                </TabPane>
             </Tabs>
         )
     };

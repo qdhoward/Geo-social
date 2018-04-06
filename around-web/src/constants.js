@@ -7,3 +7,5 @@ export const GEO_OPTIONS = {
 };
 export const AUTH_PREFIX = 'Bearer';
 export const POS_KEY = 'POS';
+export const LOC_SHAKE = 0.02;
+
